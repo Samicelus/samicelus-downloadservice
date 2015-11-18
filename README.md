@@ -15,7 +15,7 @@ Then download unzip.exe and put it in the same directory which has updateService
 Initialize Client
 ================
 
-Configurate the config.json , settle your localIP, serverIP, serverPort
+Configurate the config.json , settle your localIP, remoteIP, remotePort etc...
 ```js
 {
 "localIp":"127.0.0.1",
@@ -37,4 +37,18 @@ Configurate the config.json , settle your localIP, serverIP, serverPort
 "timer":60,
 "timerName":"看门狗最迟喂狗周期"
 }
+```
+
+Note that the remoteIP is the server's IP on which you run samicelus-ctrl, the remotePort is the socketManager's socket port,
+remoteDatabasePort is the http port of productManager, remoteDownloadPort is the download port of Samicelus-nodejs-upload.
+
+appID is the unique ID of the downloadservice. If you are trying to deploy several downloadservice in the diffrent PCs, make sure that you use different appid. This is used to regist download service on server via socket.
+
+
+Start service
+================
+
+Enter your download service folder in the cmd command line by:
+```bush
+node startMain.js
 ```
