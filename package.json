@@ -2,6 +2,7 @@
   "name": "downloadService",
   "version": "0.0.0",
   "devDependencies": {
+  	"node-schedule": "~0.2.6",
 	"needle": "~0.10.0",
 	"xml2js": "~0.4.15",
 	"gm": "~1.17.0"
