@@ -108,6 +108,8 @@ fs.readFile('./config.json', function (err, data) {
 	console.log("remotePort:["+remotePort+"]");
 	remoteDownloadPort = JSON.parse(data).remoteDownloadPort;
 	console.log("remoteDownloadPort:["+remoteDownloadPort+"]");
+	remoteDatabasePort = JSON.parse(data).remoteDatabasePort;
+	console.log("remoteDatabasePort:["+remoteDatabasePort+"]");
 	console.log("----------------------------------------");
 			
 
@@ -160,19 +162,6 @@ fs.readFile('./config.json', function (err, data) {
 									console.log("write file:"+fileNameUncap+".zip in:./ finished"); // here you go, mister.
 									console.log("start unzip file:"+fileNameUncap+".zip...");
 									exec("unzip.exe -o D:/zip/"+fileNameUncap+".zip -d "+savePath);
-									
-									//exec("unzip.exe -o "+file_name+" -d "+savePath);
-									//client.write("downloaded");
-									//UDP发消息
-									/*
-									var buf = new Buffer('{"path":"'+save_path+'","name":"'+file_name+'"}', 'utf-8');
-									s.send(buf, 0, buf.length, localASUDPPort, localIp, function(err) {
-										if(err){
-											console.log("error:"+err+" socket closed");
-											s.close();
-											}
-										});
-									*/	
 									}
 							});												
 						}
@@ -248,35 +237,6 @@ fs.readFile('./config.json', function (err, data) {
 					
 					});
 
-				
-				
-				
-				
-
-				
-				
-				
-				/*
-				fs.writeFile(jsonData.pagePath,function(err,data){
-					if(err){
-						console.log(err);
-						}else{
-							parser.addListener('end', function(result){								
-								console.log(data.toString('utf8'));
-								console.log(result);								
-								var jsonMsg = {command:"savePageInfo",appid:jsonData.appid,pageEname:jsonData.pageEname,pageInfo:result};
-								console.log("saving pageInfo...");
-								console.log(JSON.stringify(jsonMsg));								
-								var postData = querystring.stringify({'data':JSON.stringify(jsonMsg)});
-								console.log(postData);
-								console.log("-----------------------------------");
-								//发送请求
-								sendPostData(postData);
-								});				
-							parser.parseString(data);
-							}		
-					});
-				*/
 				}			
 			}	
 		});
@@ -296,81 +256,78 @@ fs.readFile('./config.json', function (err, data) {
 	s.on('message',function(msg,rinfo){
 		console.log("UDP message got:["+msg+"] from " +rinfo.address+":"+rinfo.port);
 		//这里判断UDP发来消息...
-	});			
+		});			
 	/****************************初始化********************/	
+
+	function sendPostDataCallback(postData,callback){
+		console.log("sending msg to "+remoteIp);
+		var options = {
+			hostname: remoteIp,
+			port: remoteDatabasePort,
+			path: '',
+			method: 'POST',
+			headers: {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': postData.length}
+			};
+		var req = http.request(options, function(res) {
+		  console.log('STATUS: ' + res.statusCode);
+		  console.log('HEADERS: ' + JSON.stringify(res.headers));
+		  res.setEncoding('utf8');
+		  var receivedData = "";
+		  res.on('data', function (chunk) {
+			//console.log('BODY: ' + chunk);
+			receivedData += chunk;
+		  });
+		  res.on('end', function() {
+			console.log('No more data in response.');
+			//console.log(receivedData);
+			callback(receivedData);
+			receivedData = "";
+		  });
+		});
+
+		req.on('error', function(e) {
+		  console.log('problem with request: ' + e.message);
+		});
+
+		// write data to request body
+		req.write(postData);
+		req.end();	
+		}
+
+	function sendPostData(postData){
+		console.log("sending msg to "+remoteIp);
+		var options = {
+			hostname: remoteIp,
+			port: remoteDatabasePort,
+			path: '',
+			method: 'POST',
+			headers: {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': postData.length}
+			};
+		var req = http.request(options, function(res) {
+		  console.log('STATUS: ' + res.statusCode);
+		  console.log('HEADERS: ' + JSON.stringify(res.headers));
+		  res.setEncoding('utf8');
+		  res.on('data', function (chunk) {
+			console.log('BODY: ' + chunk);
+		  });
+		  res.on('end', function() {
+			console.log('No more data in response.')
+		  })
+		});
+
+		req.on('error', function(e) {
+		  console.log('problem with request: ' + e.message);
+		});
+
+		// write data to request body
+		req.write(postData);
+		req.end();	
+		}
+
+	//去掉后缀
+	function delExtension(str){
+		var reg = /\.\w+$/;
+		return str.replace(reg,'');
+		}	
+
 });
-
-
-
-function sendPostData(postData){
-	console.log("sending msg to "+serverIP);
-	var options = {
-		hostname: serverIP,
-		port: 6007,
-		path: '',
-		method: 'POST',
-		headers: {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': postData.length}
-		};
-	var req = http.request(options, function(res) {
-	  console.log('STATUS: ' + res.statusCode);
-	  console.log('HEADERS: ' + JSON.stringify(res.headers));
-	  res.setEncoding('utf8');
-	  res.on('data', function (chunk) {
-		console.log('BODY: ' + chunk);
-	  });
-	  res.on('end', function() {
-		console.log('No more data in response.')
-	  })
-	});
-
-	req.on('error', function(e) {
-	  console.log('problem with request: ' + e.message);
-	});
-
-	// write data to request body
-	req.write(postData);
-	req.end();	
-}
-
-
-function sendPostDataCallback(postData,callback){
-	console.log("sending msg to "+serverIP);
-	var options = {
-		hostname: serverIP,
-		port: 6007,
-		path: '',
-		method: 'POST',
-		headers: {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': postData.length}
-		};
-	var req = http.request(options, function(res) {
-	  console.log('STATUS: ' + res.statusCode);
-	  console.log('HEADERS: ' + JSON.stringify(res.headers));
-	  res.setEncoding('utf8');
-	  var receivedData = "";
-	  res.on('data', function (chunk) {
-		//console.log('BODY: ' + chunk);
-		receivedData += chunk;
-	  });
-	  res.on('end', function() {
-		console.log('No more data in response.');
-		//console.log(receivedData);
-		callback(receivedData);
-		receivedData = "";
-	  });
-	});
-
-	req.on('error', function(e) {
-	  console.log('problem with request: ' + e.message);
-	});
-
-	// write data to request body
-	req.write(postData);
-	req.end();	
-}
-
-
-//去掉后缀
-function delExtension(str){
-	var reg = /\.\w+$/;
-	return str.replace(reg,'');
-	}
