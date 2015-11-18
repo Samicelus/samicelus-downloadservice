@@ -5,7 +5,7 @@
 "localUDPPortName":"本服务UDP端口",
 "localASUDPPort":"7001",
 "localASUDPPortName":"本地AS程序UDP端口",
-"remoteIp":"115.159.39.71",
+"remoteIp":"127.0.0.1",
 "remoteIpName":"网络服务器IP",
 "remotePort":"10095",
 "remotePortName":"网络服务器Socket端口",
