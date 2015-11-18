@@ -1,0 +1,20 @@
+{
+  "name": "downloadService",
+  "version": "0.0.0",
+  "devDependencies": {
+	"needle": "~0.10.0",
+	"xml2js": "~0.4.15",
+	"gm": "~1.17.0"
+  },
+  "description": "client download service",
+  "main": "startMain.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "samicelus-downloadservice"
+  },
+  "author": "Samicelus",
+  "license": "GNU"
+}
